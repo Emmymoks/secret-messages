@@ -12,9 +12,9 @@ app.use(express.json());
 
 // Allowed origins for CORS
 const allowedOrigins = [
-  process.env.CLIENT_URL,                       // from .env
-  "http://localhost:5173",                      // local dev
-  "https://secret-messages-xi.vercel.app"       // deployed frontend
+  process.env.CLIENT_URL,                 // from .env
+  "http://localhost:5173",                // local dev
+  "https://secret-messages-xi.vercel.app" // deployed frontend
 ].filter(Boolean);
 
 console.log("🔐 Allowed origins:", allowedOrigins);
@@ -22,12 +22,11 @@ console.log("🔐 Allowed origins:", allowedOrigins);
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (e.g., Postman, curl)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         console.warn("❌ Blocked by CORS:", origin);
-        callback(new Error("Not allowed by CORS"));
+        return callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
@@ -49,17 +48,20 @@ app.use("/api/messages", msgRoutes);
 
 // Error handler (global)
 app.use((err, req, res, next) => {
-  console.error("🔥 Server error:", err.message);
+  console.error("🔥 Server error:", err.stack || err.message);
   res.status(500).json({ error: "Internal server error" });
 });
 
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;
 
+mongoose.set("strictQuery", true);
+
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    maxPoolSize: 10,
   })
   .then(() => {
     console.log("✅ Connected to MongoDB");
