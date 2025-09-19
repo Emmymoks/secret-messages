@@ -12,8 +12,9 @@ app.use(express.json());
 
 // Allowed origins for CORS
 const allowedOrigins = [
-  process.env.CLIENT_URL,
-  "http://localhost:5173", // local dev
+  process.env.CLIENT_URL,                       // from .env
+  "http://localhost:5173",                      // local dev
+  "https://secret-messages-xi.vercel.app"       // deployed frontend
 ].filter(Boolean);
 
 console.log("🔐 Allowed origins:", allowedOrigins);
@@ -21,6 +22,7 @@ console.log("🔐 Allowed origins:", allowedOrigins);
 app.use(
   cors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (e.g., Postman, curl)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
