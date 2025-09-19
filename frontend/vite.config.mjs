@@ -1,11 +1,14 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: true,   // enables LAN access
-    port: 5173
-  }
-})
+    host: true, // allows access via LAN/IP during local dev
+    port: 5173, // dev server port
+  },
+  build: {
+    outDir: "dist", // make sure build output is served correctly on Vercel
+    emptyOutDir: true, // clean before building
+  },
+});
