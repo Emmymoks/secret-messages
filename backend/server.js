@@ -10,15 +10,21 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// Configure CORS
-const allowedOrigins = [process.env.CLIENT_URL, "http://localhost:5173"].filter(Boolean);
+// Allowed origins for CORS
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:5173", // local dev
+].filter(Boolean);
+
+console.log("🔐 Allowed origins:", allowedOrigins);
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, curl, etc.)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.warn("❌ Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
@@ -39,21 +45,28 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", msgRoutes);
 
-// Error handler
+// Error handler (global)
 app.use((err, req, res, next) => {
-  console.error("Server error:", err.message);
+  console.error("🔥 Server error:", err.message);
   res.status(500).json({ error: "Internal server error" });
 });
 
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;
+
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log("✅ Connected to MongoDB");
-    app.listen(PORT, () => console.log(`🚀 Server listening on port ${PORT}`));
+    app.listen(PORT, () => {
+      console.log(`🚀 Server listening on port ${PORT}`);
+      console.log(`🌍 Client URL allowed: ${process.env.CLIENT_URL || "None set"}`);
+    });
   })
   .catch((err) => {
-    console.error("❌ Mongo connection error:", err);
+    console.error("❌ MongoDB connection error:", err);
     process.exit(1);
   });
