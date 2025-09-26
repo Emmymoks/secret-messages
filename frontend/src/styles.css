@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global warm background and gentle typography */
+body { @apply bg-warmbg text-gray-800 antialiased; font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+
+/* Floating shapes container */
+.floating-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.shape { position: absolute; transform-style: preserve-3d; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.12)); opacity: 0.95; }
+.shape.heart { width: 96px; height: 90px; background: radial-gradient(circle at 30% 30%, #ff8aa0, #ff4d6d); border-radius: 48px 48px 20px 20px; transform: rotate(45deg); }
+.shape.diamond { width: 80px; height: 80px; background: linear-gradient(45deg,#ffd1e0,#ffa8d6); transform: rotate(45deg); border-radius: 8px; }
+@keyframes floaty { 0% { transform: translateY(0) rotate(0deg) } 50% { transform: translateY(-18px) rotate(12deg) } 100% { transform: translateY(0) rotate(0deg) } }
+.shape { animation: floaty 6s ease-in-out infinite; }
+
+/* Card */
+.card { @apply relative z-10 bg-white/90 rounded-2xl p-6 shadow-xl; backdrop-filter: blur(6px); }
+
+/* simple fade-in */
+.fade-in { animation: fadeIn 0.6s ease forwards; opacity: 0; }
+@keyframes fadeIn { to { opacity: 1; transform: none; } }
+

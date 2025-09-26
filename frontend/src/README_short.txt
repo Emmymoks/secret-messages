@@ -1,0 +1,1 @@
+This frontend uses Vite + React + Tailwind.
