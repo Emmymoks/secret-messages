@@ -25,13 +25,20 @@ console.log("✅ Allowed Origins:", allowedOrigins);
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow server-to-server or curl/postman
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      console.warn("🚫 Blocked by CORS:", origin);
-      return callback(new Error('CORS not allowed for: ' + origin), false);
+        // Allow server-to-server or curl/postman (no origin)
+        if (!origin) return callback(null, true);
+
+        // If operator has explicitly allowed all origins via env, accept everything.
+        if (process.env.ALLOW_ALL_ORIGINS === 'true' || allowedOrigins.includes('*')) {
+          return callback(null, true);
+        }
+
+        if (allowedOrigins.includes(origin)) {
+          return callback(null, true);
+        }
+
+        console.warn("🚫 Blocked by CORS:", origin);
+        return callback(new Error('CORS not allowed for: ' + origin), false);
     },
     credentials: true,
   })
@@ -53,6 +60,20 @@ const MONGO_URI = process.env.MONGODB_URI;
 if (!MONGO_URI) {
   console.error('❌ Missing MONGODB_URI in environment variables');
   process.exit(1);
+}
+
+// Ensure JWT secret is present in production, provide a safe fallback in development
+if (!process.env.JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('❌ Missing JWT_SECRET in environment variables (required in production)');
+    process.exit(1);
+  } else {
+    // Generate a temporary secret for local development so dev servers don't crash.
+    // This is intentionally permissive for dev; set JWT_SECRET in production.
+    const { randomBytes } = require('crypto');
+    process.env.JWT_SECRET = randomBytes(48).toString('hex');
+    console.warn('⚠️ JWT_SECRET not provided — using a temporary development secret.\nSet JWT_SECRET in your .env or platform config for production deployments.');
+  }
 }
 
 // Connect to MongoDB and start server
