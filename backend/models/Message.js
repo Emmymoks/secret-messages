@@ -1,11 +1,25 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
-const MessageSchema = new Schema({
-  toUser: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  fromName: { type: String },
-  content: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
-});
+const MessageSchema = new mongoose.Schema(
+  {
+    toUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    fromName: {
+      type: String,
+      trim: true,
+      default: "Anonymous",
+    },
+    content: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 500, // prevents excessively long messages
+    },
+  },
+  { timestamps: true } // adds createdAt & updatedAt automatically
+);
 
-module.exports = mongoose.model('Message', MessageSchema);
+module.exports = mongoose.model("Message", MessageSchema);
