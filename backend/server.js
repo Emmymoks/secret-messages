@@ -1,73 +1,80 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const authRoutes = require('./routes/auth');
-const messageRoutes = require('./routes/messages');
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+
+const authRoutes = require("./routes/auth");
+const messageRoutes = require("./routes/messages");
 
 const app = express();
 
-// Middleware
+// -------------------- Middleware --------------------
 app.use(express.json());
 app.use(cookieParser());
+app.use(helmet()); // basic security headers
 
-// Allowed origins for CORS (frontend)
+// CORS
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:5173'
+  process.env.FRONTEND_URL || "http://localhost:5173",
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow server-to-server or tools like curl (no origin)
-      if (!origin) return callback(null, true);
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // allow server-to-server/curl
       if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error('CORS not allowed for: ' + origin), false);
+      console.warn("❌ Blocked CORS request from:", origin);
+      return callback(new Error("Not allowed by CORS"), false);
     },
     credentials: true,
   })
 );
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/messages', messageRoutes);
+// Rate limiting (protects from abuse on public routes)
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 mins
+  max: 300, // limit each IP
+  message: { message: "Too many requests, try again later." },
+});
+app.use("/api/", apiLimiter);
 
-// Health check
-app.get('/', (req, res) => {
-  res.json({ status: 'ok', message: 'Secret Messages API running 🚀' });
+// -------------------- Routes --------------------
+app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoutes);
+
+app.get("/", (req, res) => {
+  res.json({ status: "ok", message: "Secret Messages API running 🚀" });
 });
 
+// -------------------- Database & Server --------------------
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGODB_URI;
 
-// Ensure Mongo URI is set
 if (!MONGO_URI) {
-  console.error('❌ Missing MONGODB_URI in environment variables');
+  console.error("❌ Missing MONGODB_URI in environment variables");
   process.exit(1);
 }
 
-// Connect to MongoDB and start server
 mongoose
-  .connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(MONGO_URI)
   .then(() => {
-    console.log('✅ Connected to MongoDB');
+    console.log("✅ Connected to MongoDB");
     app.listen(PORT, () =>
       console.log(`🚀 Server running on port ${PORT}`)
     );
   })
   .catch((err) => {
-    console.error('❌ MongoDB connection error:', err.message);
+    console.error("❌ MongoDB connection error:", err.message);
     process.exit(1);
   });
 
-// Handle unexpected errors
-process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled Rejection:', reason);
+// -------------------- Error Handling --------------------
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
 });
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
 });
