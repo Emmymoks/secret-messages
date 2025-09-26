@@ -15,7 +15,7 @@ export default function Register() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `${API_URL}/api/auth/register`,
+        `${API_URL.replace(/\/$/, '')}/api/auth/register`,
         { username, password },
         { withCredentials: true } // 👈 important
       );
@@ -23,7 +23,9 @@ export default function Register() {
       setToken(res.data.token);
       nav('/dashboard');
     } catch (err) {
-      alert(err?.response?.data?.message || 'Error');
+      console.error('Register error:', err);
+      const msg = err?.response?.data?.message || err?.response?.statusText || err?.message || 'Unknown error';
+      alert('Registration failed: ' + msg);
     }
   }
 
