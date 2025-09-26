@@ -7,7 +7,7 @@ body { @apply bg-warmbg text-gray-800 antialiased; font-family: Inter, ui-sans-s
 
 /* Floating shapes container */
 .floating-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.shape { position: absolute; transform-style: preserve-3d; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.12)); opacity: 0.95; will-change: transform; }
+.shape { position: absolute; transform-style: preserve-3d; filter: blur(2px) drop-shadow(0 6px 14px rgba(0,0,0,0.06)); opacity: 0.08; will-change: transform; mix-blend-mode: multiply; }
 .shape.heart { width: 96px; height: 90px; background: radial-gradient(circle at 30% 30%, #ff8aa0, #ff4d6d); border-radius: 48px 48px 20px 20px; transform: rotate(45deg); }
 .shape.diamond { width: 80px; height: 80px; background: linear-gradient(45deg,#ffd1e0,#ffa8d6); transform: rotate(45deg); border-radius: 8px; }
 @keyframes floaty { 0% { transform: translateY(0) rotate(0deg) } 50% { transform: translateY(-18px) rotate(12deg) } 100% { transform: translateY(0) rotate(0deg) } }
@@ -30,7 +30,7 @@ body { @apply bg-warmbg text-gray-800 antialiased; font-family: Inter, ui-sans-s
 .input-action:focus { outline: 2px solid rgba(59,130,246,0.5); }
 
 /* Ensure cards are above shapes */
-.card { z-index: 10; }
+.card { z-index: 30; }
 
 /* Navigation styles */
 .nav-link { padding: 0.5rem 0.75rem; border-radius: 0.5rem; color: rgba(31,41,55,1); text-decoration: none; transition: all .18s ease; }
