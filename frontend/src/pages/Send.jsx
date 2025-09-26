@@ -15,13 +15,15 @@ export default function Send() {
     e.preventDefault();
     try {
       await axios.post(
-        `${API_URL}/api/messages/send/${userId}`,
+        `${API_URL.replace(/\/$/, '')}/api/messages/send/${userId}`,
         { fromName, content },
         { withCredentials: true } // 👈 consistency with backend CORS
       );
       setSent(true);
     } catch (err) {
-      alert(err?.response?.data?.message || 'Error sending message');
+      console.error('Send error:', err);
+      const msg = err?.response?.data?.message || err?.response?.statusText || err?.message || 'Unknown error';
+      alert('Send failed: ' + msg);
     }
   }
 
