@@ -41,6 +41,20 @@ router.post("/register", async (req, res) => {
 
     const token = generateToken(user._id);
 
+    // Also set an httpOnly cookie for deployments that prefer cookies.
+    const cookieOptions = {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    };
+    try {
+      res.cookie('token', token, cookieOptions);
+    } catch (e) {
+      // If cookie setting fails (rare), continue and return token in JSON.
+      console.warn('Could not set auth cookie:', e && e.message);
+    }
+
     res.json({
       token,
       user: { id: user._id, username: user.username },
@@ -71,6 +85,19 @@ router.post("/login", async (req, res) => {
     }
 
     const token = generateToken(user._id);
+
+    // Set httpOnly cookie as well as return token in JSON
+    const cookieOptions = {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    };
+    try {
+      res.cookie('token', token, cookieOptions);
+    } catch (e) {
+      console.warn('Could not set auth cookie:', e && e.message);
+    }
 
     res.json({
       token,
