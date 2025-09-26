@@ -60,7 +60,11 @@ router.post("/register", async (req, res) => {
       user: { id: user._id, username: user.username },
     });
   } catch (err) {
-    console.error("Register error:", err.message);
+    console.error("Register error:", err && err.message ? err.message : err);
+    // Handle duplicate key error (username already exists)
+    if (err && err.code === 11000) {
+      return res.status(400).json({ message: 'Username is already taken' });
+    }
     res.status(500).json({ message: "Server error" });
   }
 });
