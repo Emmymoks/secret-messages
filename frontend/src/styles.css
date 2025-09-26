@@ -32,6 +32,16 @@ body { @apply bg-warmbg text-gray-800 antialiased; font-family: Inter, ui-sans-s
 /* Ensure cards are above shapes */
 .card { z-index: 10; }
 
+/* Navigation styles */
+.nav-link { padding: 0.5rem 0.75rem; border-radius: 0.5rem; color: rgba(31,41,55,1); text-decoration: none; transition: all .18s ease; }
+.nav-link:hover { background: rgba(249, 225, 231, 0.6); transform: translateY(-2px); }
+.btn-primary { padding: 0.5rem 0.9rem; background: linear-gradient(90deg,#ff8aa0,#ff4d6d); color: white; border-radius: 9999px; }
+.btn-outline { padding: 0.45rem 0.8rem; border-radius: 9999px; border: 1px solid rgba(229,231,235,1); }
+.btn-ghost { padding: 0.4rem 0.7rem; border-radius: 0.5rem; background: transparent; }
+
+/* small subtle motion for links */
+.nav-link, .btn-primary, .btn-outline, .btn-ghost { will-change: transform; }
+
 /* Card */
 .card { @apply relative z-10 bg-white/90 rounded-2xl p-6 shadow-xl; backdrop-filter: blur(6px); }
 
