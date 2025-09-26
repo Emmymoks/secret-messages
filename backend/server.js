@@ -25,20 +25,41 @@ console.log("✅ Allowed Origins:", allowedOrigins);
 app.use(
   cors({
     origin: function (origin, callback) {
-        // Allow server-to-server or curl/postman (no origin)
-        if (!origin) return callback(null, true);
+      // Allow server-to-server or curl/postman (no origin)
+      if (!origin) return callback(null, true);
 
-        // If operator has explicitly allowed all origins via env, accept everything.
-        if (process.env.ALLOW_ALL_ORIGINS === 'true' || allowedOrigins.includes('*')) {
+      // If operator has explicitly allowed all origins via env, accept everything.
+      if (process.env.ALLOW_ALL_ORIGINS === 'true' || allowedOrigins.includes('*')) {
+        return callback(null, true);
+      }
+
+      // Whitelist check
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Allow common hosting domains if useful (e.g. Vercel previews)
+      try {
+        if (typeof origin === 'string' && origin.endsWith('.vercel.app')) {
+          console.log('✅ Allowing origin (vercel):', origin);
           return callback(null, true);
         }
+      } catch (e) {
+        // ignore
+      }
 
-        if (allowedOrigins.includes(origin)) {
-          return callback(null, true);
+      // Allow a custom regex pattern via env (e.g. ALLOW_ORIGIN_REGEX='^https:\/\/.*\\.example\\.com$')
+      if (process.env.ALLOW_ORIGIN_REGEX) {
+        try {
+          const re = new RegExp(process.env.ALLOW_ORIGIN_REGEX);
+          if (re.test(origin)) return callback(null, true);
+        } catch (e) {
+          console.warn('Invalid ALLOW_ORIGIN_REGEX:', e && e.message);
         }
+      }
 
-        console.warn("🚫 Blocked by CORS:", origin);
-        return callback(new Error('CORS not allowed for: ' + origin), false);
+      console.warn("🚫 Blocked by CORS:", origin);
+      return callback(new Error('CORS not allowed for: ' + origin), false);
     },
     credentials: true,
   })
