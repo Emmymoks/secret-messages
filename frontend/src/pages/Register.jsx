@@ -6,6 +6,7 @@ import AuthContext from '../utils/auth';
 export default function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const { setUser, setToken } = useContext(AuthContext);
   const nav = useNavigate();
 
@@ -40,13 +41,25 @@ export default function Register() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
-          <input
-            className="w-full p-3 rounded-lg border"
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="input-group">
+            <input
+              className="w-full p-3 rounded-lg border"
+              placeholder="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              aria-label="Password"
+            />
+            <button
+              type="button"
+              className="input-action"
+              onClick={() => setShowPassword(s => !s)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              title={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? '🙈' : '👁️'}
+            </button>
+          </div>
           <button className="w-full py-3 rounded-full bg-gradient-to-r from-softpink to-coral text-white">
             Create account
           </button>
