@@ -13,7 +13,13 @@ export default function Dashboard(){
     if(!user) return nav('/login');
     async function load(){
       try{
-        const res = await axios.get(import.meta.env.VITE_API_URL + '/api/messages/my', { headers: { Authorization: 'Bearer ' + token } });
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+        const headers = token ? { Authorization: 'Bearer ' + token } : {};
+        const res = await axios.get(API_URL + '/api/messages/my', {
+          headers,
+          // If we didn't send an Authorization header, allow cookies to be used
+          withCredentials: !token,
+        });
         setMessages(res.data.messages);
       } catch(err){ console.error(err); }
     }
