@@ -36,7 +36,23 @@ export default function Dashboard(){
           <div>
             <h1 className='text-2xl font-bold'>Hi, {user?.username}</h1>
             <p className='text-sm text-gray-500'>Your unique link to receive messages:</p>
-            <code className='block mt-2 bg-white/80 p-2 rounded'>{window.location.origin}/send/{user?.id}</code>
+            <div className='mt-2 input-group'>
+              <input readOnly className='w-full bg-white/80 p-2 rounded' value={`${window.location.origin}/send/${user?.id}`} />
+              <button
+                type='button'
+                className='input-action'
+                onClick={async ()=>{
+                  const link = `${window.location.origin}/send/${user?.id}`;
+                  try{ await navigator.clipboard.writeText(link); alert('Link copied to clipboard'); }
+                  catch(e){
+                    const el = document.createElement('textarea'); el.value = link; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert('Link copied to clipboard');
+                  }
+                }}
+                aria-label='Copy link'
+              >
+                📋
+              </button>
+            </div>
           </div>
           <div className='space-x-2'>
             <button onClick={logout} className='px-4 py-2 rounded-lg border'>Logout</button>
