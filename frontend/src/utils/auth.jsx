@@ -1,18 +1,51 @@
-import React, { createContext, useState, useEffect } from 'react';
-const AuthContext = createContext();
+import React, { createContext, useState, useEffect, useContext } from "react";
+
+const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('sm_user')); } catch(e){ return null; }
+    try {
+      const stored = localStorage.getItem("sm_user");
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
   });
-  const [token, setToken] = useState(() => localStorage.getItem('sm_token'));
 
-  useEffect(()=>{
-    if(user) localStorage.setItem('sm_user', JSON.stringify(user)); else localStorage.removeItem('sm_user');
-    if(token) localStorage.setItem('sm_token', token); else localStorage.removeItem('sm_token');
+  const [token, setToken] = useState(() => localStorage.getItem("sm_token") || null);
+
+  // Persist to localStorage whenever state changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("sm_user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("sm_user");
+    }
+
+    if (token) {
+      localStorage.setItem("sm_token", token);
+    } else {
+      localStorage.removeItem("sm_token");
+    }
   }, [user, token]);
 
-  return <AuthContext.Provider value={{user, setUser, token, setToken}}>{children}</AuthContext.Provider>
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem("sm_user");
+    localStorage.removeItem("sm_token");
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, setUser, token, setToken, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+// 🔥 Custom hook for easier usage
+export function useAuth() {
+  return useContext(AuthContext);
 }
 
 export default AuthContext;
