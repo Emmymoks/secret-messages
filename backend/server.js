@@ -14,13 +14,16 @@ app.use(cookieParser());
 
 // Allowed origins for CORS (frontend)
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:5173'
-];
+  'http://localhost:5173', // dev
+  'http://127.0.0.1:5173', // alternative localhost
+  process.env.FRONTEND_URL, // single frontend (optional)
+  ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : []) // multiple frontends
+].filter(Boolean);
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow server-to-server or tools like curl (no origin)
+      // Allow requests with no origin (server-to-server, curl, Postman)
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
       return callback(new Error('CORS not allowed for: ' + origin), false);
