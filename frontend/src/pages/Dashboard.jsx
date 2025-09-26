@@ -13,7 +13,7 @@ export default function Dashboard(){
     if(!user) return nav('/login');
     async function load(){
       try{
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+  const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
         const headers = token ? { Authorization: 'Bearer ' + token } : {};
         const res = await axios.get(API_URL + '/api/messages/my', {
           headers,
