@@ -15,17 +15,22 @@ app.use(cookieParser());
 // Allowed origins for CORS (frontend)
 const allowedOrigins = [
   'http://localhost:5173', // dev
-  'http://127.0.0.1:5173', // alternative localhost
-  process.env.FRONTEND_URL, // single frontend (optional)
-  ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : []) // multiple frontends
+  'http://127.0.0.1:5173', // alternative dev
+  process.env.FRONTEND_URL, // single frontend
+  ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : []) // multiple
 ].filter(Boolean);
+
+console.log("✅ Allowed Origins:", allowedOrigins);
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (server-to-server, curl, Postman)
+      // Allow server-to-server or curl/postman
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      console.warn("🚫 Blocked by CORS:", origin);
       return callback(new Error('CORS not allowed for: ' + origin), false);
     },
     credentials: true,
