@@ -22,7 +22,6 @@ export default function NavBar(){
 
         <div className='hidden md:flex items-center gap-3'>
           <Link to='/' className='nav-link'>Home</Link>
-          <Link to='/send' className='nav-link'>Send</Link>
           {user ? (
             <>
               <Link to='/dashboard' className='nav-link'>Dashboard</Link>
@@ -45,19 +44,27 @@ export default function NavBar(){
 
       {/* Mobile menu */}
       {open && (
-        <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} transition={{ type: 'spring' }} className='md:hidden border-t'>
-          <div className='px-4 py-3 flex flex-col gap-2'>
-            <Link to='/' onClick={()=>setOpen(false)} className='block'>Home</Link>
-            <Link to='/send' onClick={()=>setOpen(false)} className='block'>Send</Link>
+        <motion.div
+          initial="closed"
+          animate="open"
+          exit="closed"
+          variants={{
+            open: { opacity: 1, height: 'auto', transition: { stiffness: 20 } },
+            closed: { opacity: 0, height: 0, transition: { stiffness: 20 } }
+          }}
+          className='md:hidden mobile-menu'
+        >
+          <div className='px-4 py-4 flex flex-col gap-3'>
+            <Link to='/' onClick={()=>setOpen(false)} className='mobile-link'>Home</Link>
             {user ? (
               <>
-                <Link to='/dashboard' onClick={()=>setOpen(false)} className='block'>Dashboard</Link>
-                <button onClick={()=>{ setOpen(false); doLogout(); }} className='text-left'>Logout</button>
+                <Link to='/dashboard' onClick={()=>setOpen(false)} className='mobile-link'>Dashboard</Link>
+                <button onClick={()=>{ setOpen(false); doLogout(); }} className='mobile-link text-left'>Logout</button>
               </>
             ) : (
               <>
-                <Link to='/register' onClick={()=>setOpen(false)} className='block'>Get your link</Link>
-                <Link to='/login' onClick={()=>setOpen(false)} className='block'>Login</Link>
+                <Link to='/register' onClick={()=>setOpen(false)} className='mobile-link'>Get your link</Link>
+                <Link to='/login' onClick={()=>setOpen(false)} className='mobile-link'>Login</Link>
               </>
             )}
           </div>
