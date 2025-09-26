@@ -42,6 +42,19 @@ body { @apply bg-warmbg text-gray-800 antialiased; font-family: Inter, ui-sans-s
 /* small subtle motion for links */
 .nav-link, .btn-primary, .btn-outline, .btn-ghost { will-change: transform; }
 
+/* Mobile menu modern look */
+.mobile-menu { background: rgba(255,255,255,0.96); box-shadow: 0 10px 30px rgba(2,6,23,0.08); border-top-left-radius: 12px; border-top-right-radius: 12px; overflow: hidden; }
+.mobile-link { display: block; padding: 0.75rem 0.5rem; border-radius: 8px; text-decoration: none; color: rgba(31,41,55,1); transition: background .12s ease, transform .12s ease; }
+.mobile-link:hover { background: rgba(249, 225, 231, 0.7); transform: translateX(6px); }
+
+/* subtle stagger animation for mobile links when menu opens */
+.mobile-menu .mobile-link { opacity: 0; transform: translateY(6px); animation: slideIn 220ms forwards; }
+.mobile-menu .mobile-link:nth-child(1){ animation-delay: 40ms; }
+.mobile-menu .mobile-link:nth-child(2){ animation-delay: 80ms; }
+.mobile-menu .mobile-link:nth-child(3){ animation-delay: 120ms; }
+.mobile-menu .mobile-link:nth-child(4){ animation-delay: 160ms; }
+@keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
+
 /* Card */
 .card { @apply relative z-10 bg-white/90 rounded-2xl p-6 shadow-xl; backdrop-filter: blur(6px); }
 
