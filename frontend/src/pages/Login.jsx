@@ -15,7 +15,7 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `${API_URL}/api/auth/login`,
+        `${API_URL.replace(/\/$/, '')}/api/auth/login`,
         { username, password },
         { withCredentials: true } // 👈 critical for cookies
       );
@@ -23,7 +23,9 @@ export default function Login() {
       setToken(res.data.token);
       nav('/dashboard');
     } catch (err) {
-      alert(err?.response?.data?.message || 'Error');
+      console.error('Login error:', err);
+      const msg = err?.response?.data?.message || err?.response?.statusText || err?.message || 'Unknown error';
+      alert('Login failed: ' + msg);
     }
   }
 
