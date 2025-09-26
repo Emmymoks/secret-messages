@@ -12,21 +12,18 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS setup
+// Allowed origins for CORS (frontend)
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:5173',
-  'https://secret-messages-psi.vercel.app' // your deployed frontend
+  process.env.FRONTEND_URL || 'http://localhost:5173'
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps or curl)
+      // Allow server-to-server or tools like curl (no origin)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        return callback(new Error('CORS policy violation: ' + origin), false);
-      }
-      return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error('CORS not allowed for: ' + origin), false);
     },
     credentials: true,
   })
@@ -42,11 +39,15 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 4000;
-const MONGO_URI =
-  process.env.MONGODB_URI ||
-  'mongodb+srv://mokwunyeemma_db_user:xNO09eqQdvCy8L7Z@cluster0.c9fifyc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const MONGO_URI = process.env.MONGODB_URI;
 
-// Start server
+// Ensure Mongo URI is set
+if (!MONGO_URI) {
+  console.error('❌ Missing MONGODB_URI in environment variables');
+  process.exit(1);
+}
+
+// Connect to MongoDB and start server
 mongoose
   .connect(MONGO_URI, {
     useNewUrlParser: true,
@@ -54,7 +55,9 @@ mongoose
   })
   .then(() => {
     console.log('✅ Connected to MongoDB');
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    app.listen(PORT, () =>
+      console.log(`🚀 Server running on port ${PORT}`)
+    );
   })
   .catch((err) => {
     console.error('❌ MongoDB connection error:', err.message);
