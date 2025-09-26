@@ -8,11 +8,13 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Send from './pages/Send'
 import { AuthProvider } from './utils/auth'
+import NavBar from './components/NavBar'
 
 function App(){
   return (
     <AuthProvider>
       <BrowserRouter>
+        <NavBar />
         <Routes>
           <Route path='/' element={<Home/>} />
           <Route path='/register' element={<Register/>} />
